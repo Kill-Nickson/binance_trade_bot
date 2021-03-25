@@ -13,7 +13,7 @@ import config
 
 class Bot:
     def __init__(self):
-        self.socket = "wss://stream.binance.com:9443/ws/btcusdt@kline_1m"
+        self.socket = "wss://stream.binance.com:9443/ws/btcusdt@kline_5m"
         self.ma_deviation = 1
         self.trade_symbol = 'BTCUSDT'
         self.trade_quantity = Decimal(str(0.001))
@@ -37,7 +37,7 @@ class Bot:
     def on_candle_closure(self, last_close):
         self.update_orders_info()
 
-        bars = self.client.get_klines(symbol='BTCUSDT', interval='1m')
+        bars = self.client.get_klines(symbol='BTCUSDT', interval='5m')
         nine_last_closes = [b[4] for b in bars[-8:]]
         nine_last_closes.append(last_close)
 
