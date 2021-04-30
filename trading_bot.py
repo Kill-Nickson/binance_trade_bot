@@ -35,7 +35,7 @@ class Bot:
             self.on_candle_closure(last_close)
 
     def on_candle_closure(self, last_close):
-        bars = self.client.get_klines(symbol='BTCUSDT', interval='5m')
+        bars = self.client.get_klines(symbol='BTCUSDT', interval='1m')
         nine_last_closes = [b[4] for b in bars[-8:]]
         nine_last_closes.append(last_close)
 
