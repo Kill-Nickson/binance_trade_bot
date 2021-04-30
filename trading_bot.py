@@ -12,9 +12,9 @@ import config
 
 
 class Bot:
-    def __init__(self):
-        self.socket = "wss://stream.binance.com:9443/ws/btcusdt@kline_5m"
-        self.ma_deviation = 1
+    def __init__(self, ma_deviation, trade_quantity):
+        self.socket = "wss://stream.binance.com:9443/ws/btcusdt@kline_1m"
+        self.ma_deviation = ma_deviation
         self.trade_symbol = 'BTCUSDT'
         self.trade_quantity = Decimal(str(0.001))
         self.in_position = False
@@ -35,8 +35,6 @@ class Bot:
             self.on_candle_closure(last_close)
 
     def on_candle_closure(self, last_close):
-        self.update_orders_info()
-
         bars = self.client.get_klines(symbol='BTCUSDT', interval='5m')
         nine_last_closes = [b[4] for b in bars[-8:]]
         nine_last_closes.append(last_close)
@@ -51,12 +49,14 @@ class Bot:
                 if order_succeeded:
                     self.in_position = False
 
-        elif last_close < (ma - self.ma_deviation):
+        elif last_close < (self.ma - self.ma_deviation):
             if not self.in_position:
                 # Binance buy logic
                 order_succeeded = self.order(SIDE_BUY)
                 if order_succeeded:
                     self.in_position = True
+
+        self.update_orders_info()
 
     def order(self, side):
         try:
