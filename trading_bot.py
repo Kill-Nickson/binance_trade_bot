@@ -1,12 +1,9 @@
-import time
 import json
-from decimal import Decimal
 
-import numpy
 import websocket
 import binance.client
 from binance.enums import *
-from socketIO_client import SocketIO, LoggingNamespace
+from socketIO_client import SocketIO
 
 import config
 
@@ -16,9 +13,10 @@ class Bot:
         self.socket = "wss://stream.binance.com:9443/ws/btcusdt@kline_1m"
         self.ma_deviation = ma_deviation
         self.trade_symbol = 'BTCUSDT'
-        self.trade_quantity = Decimal(str(0.001))
+        self.trade_quantity = trade_quantity
         self.in_position = False
         self.client = binance.client.Client(config.API_KEY, config.API_SECRET)
+        self.ma = None
 
     def run(self):
         ws = websocket.WebSocketApp(self.socket, on_message=self.on_message)
@@ -40,9 +38,9 @@ class Bot:
         nine_last_closes.append(last_close)
 
         nine_last_closes = [float(c) for c in nine_last_closes]
-        ma = sum(nine_last_closes) / len(nine_last_closes)
+        self.ma = sum(nine_last_closes) / len(nine_last_closes)
 
-        if last_close > (ma + self.ma_deviation):
+        if last_close > (self.ma + self.ma_deviation):
             if self.in_position:
                 # Binance sell logic
                 order_succeeded = self.order(SIDE_SELL)
@@ -79,10 +77,9 @@ class Bot:
 
         if open_orders:
             for open_order in open_orders:
-                if float(open_order['price']) == ma:
+                if float(open_order['price']) == self.ma:
                     self.client.cancel_order(orderId=open_order['orderId'])
-
         orders = self.get_orders()
 
-        with SocketIO('localhost', 8000, LoggingNamespace) as socketIO:
+        with SocketIO('localhost', 8000) as socketIO:
             socketIO.emit('updating_event', orders)
