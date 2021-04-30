@@ -79,7 +79,6 @@ class Bot:
             for open_order in open_orders:
                 if float(open_order['price']) == self.ma:
                     self.client.cancel_order(orderId=open_order['orderId'])
-
         orders = self.get_orders()
 
         with SocketIO('localhost', 8000) as socketIO:
