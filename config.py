@@ -1,2 +1,2 @@
-API_KEY = 'your_api_key'
-API_SECRET = 'your_secret_key'
+API_KEY = 'FcC9TTSKPZbrVgmgxcbaW9ndYYXB6uJI7YT1VFq1pnYV7zKo08pA8UOrieSbGkti' # noqa
+API_SECRET = 'SqVbGvE1g7jJnBGH95sqrilF4pT2vJUJ9t9T65eCmqZKVFVs12qrccRgonZ7gQqx' # noqa

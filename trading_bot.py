@@ -1,22 +1,19 @@
-import time
 import json
-from decimal import Decimal
 
-import numpy
 import websocket
 import binance.client
 from binance.enums import *
-from socketIO_client import SocketIO, LoggingNamespace
+from socketIO_client import SocketIO
 
 import config
 
 
 class Bot:
-    def __init__(self):
+    def __init__(self, ma_deviation, trade_quantity):
         self.socket = "wss://stream.binance.com:9443/ws/btcusdt@kline_1m"
-        self.ma_deviation = 1
+        self.ma_deviation = ma_deviation
         self.trade_symbol = 'BTCUSDT'
-        self.trade_quantity = Decimal(str(0.001))
+        self.trade_quantity = trade_quantity
         self.in_position = False
         self.client = binance.client.Client(config.API_KEY, config.API_SECRET)
 
@@ -84,5 +81,5 @@ class Bot:
 
         orders = self.get_orders()
 
-        with SocketIO('localhost', 8000, LoggingNamespace) as socketIO:
+        with SocketIO('localhost', 8000) as socketIO:
             socketIO.emit('updating_event', orders)
