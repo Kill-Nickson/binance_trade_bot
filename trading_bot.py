@@ -16,6 +16,7 @@ class Bot:
         self.trade_quantity = trade_quantity
         self.in_position = False
         self.client = binance.client.Client(config.API_KEY, config.API_SECRET)
+        self.ma = None
 
     def run(self):
         ws = websocket.WebSocketApp(self.socket, on_message=self.on_message)
@@ -32,28 +33,28 @@ class Bot:
             self.on_candle_closure(last_close)
 
     def on_candle_closure(self, last_close):
-        self.update_orders_info()
-
         bars = self.client.get_klines(symbol='BTCUSDT', interval='1m')
         nine_last_closes = [b[4] for b in bars[-8:]]
         nine_last_closes.append(last_close)
 
         nine_last_closes = [float(c) for c in nine_last_closes]
-        ma = sum(nine_last_closes) / len(nine_last_closes)
+        self.ma = sum(nine_last_closes) / len(nine_last_closes)
 
-        if last_close > (ma + self.ma_deviation):
+        if last_close > (self.ma + self.ma_deviation):
             if self.in_position:
                 # Binance sell logic
                 order_succeeded = self.order(SIDE_SELL)
                 if order_succeeded:
                     self.in_position = False
 
-        elif last_close < (ma - self.ma_deviation):
+        elif last_close < (self.ma - self.ma_deviation):
             if not self.in_position:
                 # Binance buy logic
                 order_succeeded = self.order(SIDE_BUY)
                 if order_succeeded:
                     self.in_position = True
+
+        self.update_orders_info()
 
     def order(self, side):
         try:
@@ -76,7 +77,7 @@ class Bot:
 
         if open_orders:
             for open_order in open_orders:
-                if float(open_order['price']) == ma:
+                if float(open_order['price']) == self.ma:
                     self.client.cancel_order(orderId=open_order['orderId'])
 
         orders = self.get_orders()

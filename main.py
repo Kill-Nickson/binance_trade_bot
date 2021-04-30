@@ -24,12 +24,13 @@ def app_run_process(m_d, t_q):
     def update_orders_info(all_orders):
         if not all_orders:
             # Test orders list
-            orders = [
-                [12344321, "NEW", "0.1", "BUY", "BTCUSDT"],
-                [12344322, "FILLED", "0.5", "SELL", "BTCUSDT"],
-                [12344326, "FILLED", "0.3", "SELL", "BTCUSDT"],
-                [12344329, "NEW", "0.1", "BUY", "BTCUSDT"],
-            ]
+            # orders = [
+            #     [12344321, "NEW", "0.1", "BUY", "BTCUSDT"],
+            #     [12344322, "FILLED", "0.5", "SELL", "BTCUSDT"],
+            #     [12344326, "FILLED", "0.3", "SELL", "BTCUSDT"],
+            #     [12344329, "NEW", "0.1", "BUY", "BTCUSDT"],
+            # ]
+            orders = []
         else:
             orders = [[order['orderId'],
                        order['status'],
